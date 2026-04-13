@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игровой плеер - Хаб</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #020617;
+            font-family: system-ui, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Верхняя панель */
+        .top-bar {
+            background: #0f172a;
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+            flex-shrink: 0;
+        }
+
+        .back-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: #60a5fa;
+        }
+
+        .game-title-header {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Основной блок: игра + баннер */
+        .game-layout {
+            display: flex;
+            flex: 1;
+            min-height: 0;  /* важно для flex-ограничения */
+            gap: 1rem;
+            padding: 1rem;
+            overflow: hidden;
+        }
+
+        /* БЛОК С ИГРОЙ (iframe) */
+        .game-area {
+            flex: 3;
+            background: #000000;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* БОКОВОЙ БАННЕР (реклама) */
+        .ad-sidebar {
+            flex: 0.8;
+            min-width: 200px;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+            border: 1px dashed #3b82f6;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .ad-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #5b6e8c;
+            margin-bottom: 1rem;
+        }
+
+        .banner-content {
+            background: #0a0f1c;
+            border-radius: 1rem;
+            width: 100%;
+            padding: 1.5rem 0.5rem;
+            color: #cbd5e6;
+            font-weight: bold;
+        }
+
+        /* Заглушка баннера — замените на реальный код рекламы */
+        .fake-ad {
+            background: #111827;
+            border-radius: 0.8rem;
+            padding: 1rem;
+            font-size: 0.9rem;
+            border: 1px solid #2563eb;
+        }
+
+        .fake-ad button {
+            background: #3b82f6;
+            border: none;
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        @media (max-width: 700px) {
+            .game-layout {
+                flex-direction: column;
+            }
+            .ad-sidebar {
+                min-height: 140px;
+                flex: none;
+                flex-direction: row;
+                gap: 1rem;
+            }
+            .game-area {
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="top-bar">
+    <a href="game.html" class="back-link" id="backLink">← Назад к описанию</a>
+    <div class="game-title-header" id="gameTitleSpan">Игра</div>
+    <div style="width: 60px;"></div> <!-- пусто для баланса -->
+</div>
+
+<div class="game-layout">
+    <!-- Левая/основная часть: iframe с игрой -->
+    <div class="game-area">
+        <iframe id="gameIframe" class="game-frame" src="about:blank" allowfullscreen></iframe>
+    </div>
+
+    <!-- ПРАВЫЙ БАННЕР (реклама) -->
+    <!-- <div class="ad-sidebar">
+        <div class="ad-label">Реклама</div>
+        <div class="banner-content"> -->
+            <!-- ЗДЕСЬ МОЖНО РАЗМЕСТИТЬ ЛЮБОЙ РЕКЛАМНЫЙ КОД -->
+            <!-- <div class="fake-ad">
+                🧨 <strong>Ваша реклама</strong><br>
+                <span style="font-size:11px;">Текст баннера 300x250</span><br>
+                <button onclick="alert('Клик по рекламе (демо)')">Узнать больше</button>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.7rem; color:#4b5563;">
+                Рекламное место<br> -->
+                <!-- Пример с картинкой-заглушкой -->
+                <!-- <div style="background:#1f2a3e; margin-top:6px; padding:4px; border-radius:8px;">📢 banner-300x250</div>
+            </div>
+        </div>
+        <div style="margin-top: 0.8rem; font-size:0.65rem; color:#3b4a62;">Партнёрская сеть</div>
+    </div> -->
+</div>
+
+<script>
+    // Получаем данные об игре из localStorage
+    const gameUrl = localStorage.getItem('gameToPlayUrl');
+    const gameTitle = localStorage.getItem('gameToPlayTitle');
+
+    const iframe = document.getElementById('gameIframe');
+    const titleSpan = document.getElementById('gameTitleSpan');
+
+    if (gameTitle) {
+        titleSpan.textContent = gameTitle;
+    } else {
+        titleSpan.textContent = "Игра";
+    }
+
+    if (gameUrl && gameUrl !== "undefined" && gameUrl !== "null") {
+        iframe.src = gameUrl;
+    } else {
+        // Если нет ссылки — покажем демо-игру (встроенную или сообщение)
+        iframe.srcdoc = `
+            <html style="background:#0b1120;color:white;display:flex;align-items:center;justify-content:center;font-family:sans-serif;">
+                <body style="text-align:center;">
+                    <h2>🎮 Демо-режим</h2>
+                    <p>Здесь будет ваша игра из iframe.<br>Укажите реальный URL в базе данных gamesDB.</p>
+                    <small style="color:#aaa;">пример: "gameUrl": "https://example.com/game/"</small>
+                </body>
+            </html>
+        `;
+    }
+
+    // Можно добавить fallback, если localStorage пуст
+    if (!gameUrl || gameUrl === "null") {
+        console.warn("URL игры не задан. Проверьте gameUrl в gamesDB.");
+    }
+</script>
+</body>
+</html>
