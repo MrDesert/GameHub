@@ -307,7 +307,7 @@ footer {
 }
 
 .nav-btn {
-    background: #3b82f6;
+    background: linear-gradient(135deg, #3b82f6, #2257ac);
     color: white;
     border: none;
     padding: 0.4rem 1rem;
@@ -315,19 +315,12 @@ footer {
     cursor: pointer;
     font-size: 0.85rem;
     text-decoration: none;
-    transition: background 0.2s;
+    transition: transform 0.2s, brightness 0.2s;
 }
 
 .nav-btn:hover {
-    background: #2563eb;
-}
-
-.nav-btn.all-games {
-    background: #8b5cf6;
-}
-
-.nav-btn.all-games:hover {
-    background: #7c3aed;
+    filter: brightness(1.05);
+    transform: scale(1.01);
 }
 
 .game-title-header {

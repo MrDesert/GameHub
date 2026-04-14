@@ -87,7 +87,7 @@ function renderGames() {
                 <div>Разработчик: <span class="game-author" data-author="${game.author}">${game.author}</span></div>
                 <div class="game-desc">${game.shortDesc.substring(0, 80)}${game.shortDesc.length > 80 ? '...' : ''}</div>
                 <div class="card-buttons">
-                    <button class="btn btn-play" data-id="${game.id}" data-action="play">🎮 Играть</button>
+                    <button class="btn" data-id="${game.id}" data-action="play">🎮 Играть</button>
                     <button class="btn" data-id="${game.id}" data-action="details">📖 Подробнее</button>
                 </div>
             </div>
@@ -384,7 +384,6 @@ function loadGameDetails() {
                 <div class="game-title">${game.title}</div>
                 <div>Разработчик: <span class="game-author" data-author="${game.author}" style="cursor:pointer;">${game.author}</span></div>
                 <div style="color:#94a3b8; margin-top: 0.5rem;">${game.shortDesc}</div>
-                <button class="btn" id="shareBtn" style="margin-top: 1rem; background: #8b5cf6; width: auto; padding: 0.3rem 1rem;">📋 Скопировать ссылку</button>
             </div>
         </div>
         ${galleryHtml}
@@ -395,7 +394,7 @@ function loadGameDetails() {
         <button class="btn" id="startGameBtn">🎮 ИГРАТЬ →</button>
         
         <div class="other-games-section">
-            <div class="other-games-title">🎲 Другие игры</div>
+            <div class="other-games-title">Другие игры</div>
             <div class="other-games-grid" id="otherGamesGrid">
                 ${otherGames.map(other => `
                     <div class="other-game-card" data-id="${other.id}">
