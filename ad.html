@@ -99,27 +99,42 @@
 <body>
 
     <div class="video-wrapper">
-        <a href="http://127.0.0.1:3000/GameHub/play.html?id=minergame" target="_blank"><video id="adVideo" muted playsinline>
+        <a id="vid1" href="http://127.0.0.1:3000/GameHub/play.html?id=minergame" target="_blank"><video id="adVideo1" muted playsinline>
             <source src="VIDEO/MinerGameTrailer.mp4" type="video/mp4">
         </video></a>
         
+        <a id="vid2" href="https://desertbox.ru/play.html?id=CritOrQuit" target="_blank"><video id="adVideo2" muted playsinline>
+            <source src="VIDEO/CritOrQuitTrailer.mp4" type="video/mp4">
+        </video></a>
+
         <div id="timer"></div>
         <button id="closeBtn">X Получить награду</button>
         <div class="label">Реклама</div>
     </div>
 
     <script>
-        const video = document.getElementById('adVideo');
+        const video1 = document.getElementById('adVideo1');
+        const video2 = document.getElementById('adVideo2');
         const timer = document.getElementById('timer');
         const closeBtn = document.getElementById('closeBtn');
+        const rndVid = Math.floor(Math.random()*2);
         
         let seconds = 10;
         let timerFinished = false;
         
-        // Запускаем видео
-        video.play().catch(() => {
+        if(rndVid === 0){
+        document.getElementById("vid2").hidden = true;
+        // Запускаем видео1
+        video1.play().catch(() => {
             timer.textContent = '▶ Нажмите для запуска';
         });
+        } else {
+        document.getElementById("vid1").hidden = true;
+                // Запускаем видео2
+        video2.play().catch(() => {
+            timer.textContent = '▶ Нажмите для запуска';
+        });
+        }
         
         // Таймер
         const interval = setInterval(() => {
@@ -142,7 +157,7 @@
         document.addEventListener('contextmenu', (e) => e.preventDefault());
         
         // Когда видео закончилось (запасной вариант)
-        video.onended = () => {
+        video1.onended = () => {
             if (!timerFinished) {
                 clearInterval(interval);
                 timerFinished = true;
