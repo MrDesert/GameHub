@@ -30,15 +30,18 @@
         // Слушаем сообщения из iframe с рекламой
         window.addEventListener('message', (event) => {
 
+            const typeAd = event.data.typeAd;
+            const tipeGive = event.data.tipeGive;
+
             // Сообщение от игры: показать рекламу
-            if (event.data === 'show_ad') {
-                showAd();
+            if (typeAd === 'rewarded') {
+                showAdRewarded();
             }
 
             if (event.data === 'ad_complete') {
                 // Реклама просмотрена! Даём награду
                 adOverlay.style.display = 'none';
-                alert('🎉 Вы получили бонус!');
+                alert('🎉 Вы получили !'+tipeGive);
                 
                 // Здесь можно вызвать функцию игры
                 // Например: gameFrame.contentWindow.giveBonus();
@@ -46,7 +49,7 @@
         });
         
         // Показать рекламу
-        function showAd() {
+        function showAdRewarded() {
             adOverlay.style.display = 'block';
             // Перезагружаем iframe с рекламой, чтобы видео началось с начала
             adOverlay.src = adOverlay.src;
