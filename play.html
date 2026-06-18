@@ -24,11 +24,17 @@
         <iframe id="adOverlay" src="ad.html"></iframe>
     </div>
     <script>
+        const gameIframe = document.getElementById('gameIframe');
         const adOverlay = document.getElementById('adOverlay');
-        const bonusBtn = document.getElementById('bonusBtn');
         
         // Слушаем сообщения из iframe с рекламой
         window.addEventListener('message', (event) => {
+
+            // Сообщение от игры: показать рекламу
+            if (event.data === 'show_ad') {
+                showAd();
+            }
+
             if (event.data === 'ad_complete') {
                 // Реклама просмотрена! Даём награду
                 adOverlay.style.display = 'none';
@@ -39,12 +45,17 @@
             }
         });
         
-        // Показываем рекламу по кнопке
-        bonusBtn.onclick = () => {
+        // Показать рекламу
+        function showAd() {
             adOverlay.style.display = 'block';
-            // Перезагружаем iframe с рекламой, чтобы видео началось заново
+            // Перезагружаем iframe с рекламой, чтобы видео началось с начала
             adOverlay.src = adOverlay.src;
-        };
+        }
+
+        // Скрыть рекламу
+        function hideAd() {
+            adOverlay.style.display = 'none';
+        }
     </script>
 
     <!-- БАННЕР СПРАВА -->
