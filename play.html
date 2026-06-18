@@ -20,7 +20,32 @@
     <!-- ИГРА -->
     <div class="game-area">
         <iframe id="gameIframe" class="game-frame" src="about:blank" allowfullscreen></iframe>
+        <!-- Реклама (поверх игры) -->
+        <iframe id="adOverlay" src="ad.html"></iframe>
     </div>
+    <script>
+        const adOverlay = document.getElementById('adOverlay');
+        const bonusBtn = document.getElementById('bonusBtn');
+        
+        // Слушаем сообщения из iframe с рекламой
+        window.addEventListener('message', (event) => {
+            if (event.data === 'ad_complete') {
+                // Реклама просмотрена! Даём награду
+                adOverlay.style.display = 'none';
+                alert('🎉 Вы получили бонус!');
+                
+                // Здесь можно вызвать функцию игры
+                // Например: gameFrame.contentWindow.giveBonus();
+            }
+        });
+        
+        // Показываем рекламу по кнопке
+        bonusBtn.onclick = () => {
+            adOverlay.style.display = 'block';
+            // Перезагружаем iframe с рекламой, чтобы видео началось заново
+            adOverlay.src = adOverlay.src;
+        };
+    </script>
 
     <!-- БАННЕР СПРАВА -->
     <div class="ad-sidebar">
