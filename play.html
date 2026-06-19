@@ -30,24 +30,28 @@
         // Слушаем сообщения из iframe с рекламой
         window.addEventListener('message', (event) => {
 
+            const type = event.data.type;
             const typeAd = event.data.typeAd;
             const tipeGive = event.data.tipeGive;
 
-            console.log("do sudo doshlo")
             console.log("typeAa "+typeAd)
 
             // Сообщение от игры: показать рекламу
-            if (typeAd === 'rewarded') {
-                showAdRewarded();
-            }
-
-            if (event.data === 'ad_complete') {
-                // Реклама просмотрена! Даём награду
-                adOverlay.style.display = 'none';
-                alert('🎉 Вы получили !'+tipeGive);
+            if(type === 'start'){
+                if (typeAd === 'rewarded') {
+                    adOverlay.contentWindow.postMessage({
+                        typeAd: typeAd,
+                        tipeGive: tipeGive
+                    }, '*');
+                    showAdRewarded();
+                }
+            }else if (type === 'finish'){
+                    // Реклама просмотрена! Даём награду
+                    adOverlay.style.display = 'none';
+                    alert('🎉 Вы получили !'+tipeGive);
                 
-                // Здесь можно вызвать функцию игры
-                // Например: gameFrame.contentWindow.giveBonus();
+                    // Здесь можно вызвать функцию игры
+                    // Например: gameFrame.contentWindow.giveBonus();
             }
         });
         

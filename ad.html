@@ -156,6 +156,15 @@
         // Блокируем контекстное меню (ПКМ)
         document.addEventListener('contextmenu', (e) => e.preventDefault());
         
+        let typeAd;
+        let tipeGive;
+
+        window.addEventListener('message', (event) => {
+
+            typeAd = event.data.typeAd;
+            tipeGive = event.data.tipeGive;
+        });
+
         // Когда видео закончилось (запасной вариант)
         video1.onended = () => {
             if (!timerFinished) {
@@ -167,8 +176,10 @@
         };
         
         // При клике на "Получить награду"
-        closeBtn.onclick = () => {
-            window.parent.postMessage('ad_complete', '*');
+        closeBtn.onclick = () => {window.parent.postMessage({
+                    typeAd: typeAd,
+                    tipeGive: tipeGive
+                }, '*');
         };
     </script>
 </body>
