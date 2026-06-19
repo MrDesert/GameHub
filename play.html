@@ -23,50 +23,62 @@
         <!-- Реклама (поверх игры) -->
         <iframe id="adOverlay" src="ad.html"></iframe>
     </div>
-    <script>
-        const gameIframe = document.getElementById('gameIframe');
-        const adOverlay = document.getElementById('adOverlay');
-        
-        // Слушаем сообщения из iframe с рекламой
-        window.addEventListener('message', (event) => {
+   <script>
+    const gameIframe = document.getElementById('gameIframe');
+    const adOverlay = document.getElementById('adOverlay');
+    let isAdShowing = false; // ← ДОБАВЛЯЕМ ФЛАГ
 
-            const type = event.data.type;
-            const typeAd = event.data.typeAd;
-            const tipeGive = event.data.tipeGive;
-
-            console.log("typeAa "+typeAd)
-
-            // Сообщение от игры: показать рекламу
-            if(type === 'start'){
-                if (typeAd === 'rewarded') {
-                    adOverlay.contentWindow.postMessage({
-                        typeAd: typeAd,
-                        tipeGive: tipeGive
-                    }, '*');
-                    showAdRewarded();
-                }
-            }else if (type === 'finish'){
-                    // Реклама просмотрена! Даём награду
-                    adOverlay.style.display = 'none';
-                    alert('🎉 Вы получили !'+tipeGive);
-                
-                    // Здесь можно вызвать функцию игры
-                    // Например: gameFrame.contentWindow.giveBonus();
-            }
-        });
-        
-        // Показать рекламу
-        function showAdRewarded() {
-            adOverlay.style.display = 'block';
-            // Перезагружаем iframe с рекламой, чтобы видео началось с начала
-            adOverlay.src = adOverlay.src;
+    window.addEventListener('message', (event) => {
+        if (event.source === window) {
+            console.log("Родитель: сообщение от себя, игнорирую");
+            return;
         }
 
-        // Скрыть рекламу
-        function hideAd() {
+        const data = event.data;
+        const type = data?.type;
+        const typeAd = data?.typeAd;
+        const tipeGive = data?.tipeGive;
+
+        if (type === 'start') {
+            // === ЕСЛИ РЕКЛАМА УЖЕ ПОКАЗЫВАЕТСЯ — ИГНОРИРУЕМ ===
+            if (isAdShowing) {
+                console.warn("Реклама уже показывается, игнорирую повторный start");
+                return;
+            }
+
+            if (typeAd === 'rewarded') {
+                isAdShowing = true; // ← УСТАНАВЛИВАЕМ ФЛАГ
+                console.log("Показываю рекламу, награда:", tipeGive);
+                
+                adOverlay.contentWindow.postMessage({
+                    type: type,
+                    typeAd: typeAd,
+                    tipeGive: tipeGive
+                }, '*');
+                showAdRewarded();
+            }
+        } else if (type === 'finish') {
+            console.log("На главную пришло реклама на финише", tipeGive);
+            gameIframe.contentWindow.postMessage({
+                    type: type,
+                    typeAd: typeAd,
+                    tipeGive: tipeGive
+            }, '*');
+            isAdShowing = false; // ← СБРАСЫВАЕМ ФЛАГ
             adOverlay.style.display = 'none';
         }
-    </script>
+    });
+
+    function showAdRewarded() {
+        adOverlay.style.display = 'block';
+        // НЕ ПЕРЕЗАГРУЖАЙ iframe!
+        // adOverlay.src = adOverlay.src;
+    }
+
+    function hideAd() {
+        adOverlay.style.display = 'none';
+    }
+</script>
 
     <!-- БАННЕР СПРАВА -->
     <div class="ad-sidebar">

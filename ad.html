@@ -112,74 +112,120 @@
         <div class="label">Реклама</div>
     </div>
 
-    <script>
+<script>
+        // === ЭЛЕМЕНТЫ ===
         const video1 = document.getElementById('adVideo1');
         const video2 = document.getElementById('adVideo2');
         const timer = document.getElementById('timer');
         const closeBtn = document.getElementById('closeBtn');
-        const rndVid = Math.floor(Math.random()*2);
         
+        // === ПЕРЕМЕННЫЕ ===
+        let interval = null;
         let seconds = 10;
         let timerFinished = false;
+        let isPlaying = false;
+        let rewardData = null; // { typeAd, tipeGive }
         
-        if(rndVid === 0){
-        document.getElementById("vid2").hidden = true;
-        // Запускаем видео1
-        video1.play().catch(() => {
-            timer.textContent = '▶ Нажмите для запуска';
-        });
-        } else {
-        document.getElementById("vid1").hidden = true;
-                // Запускаем видео2
-        video2.play().catch(() => {
-            timer.textContent = '▶ Нажмите для запуска';
-        });
-        }
-        
-        // Таймер
-        const interval = setInterval(() => {
-            timer.textContent = '⏱ ' + seconds;
-            seconds--;
-            if (seconds <= 0) {
-                clearInterval(interval);
-                timerFinished = true;
-                timer.style.display = 'none';
-                closeBtn.style.display = 'block';
-            }
-        }, 1000);
-        
-        // Блокируем клавиши (пробел и escape)
+        // === БЛОКИРОВКА КЛАВИШ (постоянная) ===
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space' || e.code === 'Escape') e.preventDefault();
         });
-        
-        // Блокируем контекстное меню (ПКМ)
         document.addEventListener('contextmenu', (e) => e.preventDefault());
         
-        let typeAd;
-        let tipeGive;
-
-        window.addEventListener('message', (event) => {
-
-            typeAd = event.data.typeAd;
-            tipeGive = event.data.tipeGive;
-        });
-
-        // Когда видео закончилось (запасной вариант)
-        video1.onended = () => {
-            if (!timerFinished) {
-                clearInterval(interval);
-                timerFinished = true;
-                timer.style.display = 'none';
-                closeBtn.style.display = 'block';
+        // === ОБРАБОТЧИК СООБЩЕНИЙ (ОДИН РАЗ) ===
+        window.addEventListener('message', function handler(event) {
+            const data = event.data;
+            
+            console.log("ad.html получил:", data);
+            
+            // Только если это старт и реклама не идёт
+            if (data && data.type === "start" && !isPlaying) {
+                rewardData = {
+                    typeAd: data.typeAd,
+                    tipeGive: data.tipeGive
+                };
+                console.log("Запускаю рекламу, награда:", rewardData);
+                startAd();
             }
-        };
+        }, {once: true});
         
-        // При клике на "Получить награду"
-        closeBtn.onclick = () => {window.parent.postMessage({
-                    typeAd: typeAd,
-                    tipeGive: tipeGive
-                }, '*');
+        // === ЗАПУСК РЕКЛАМЫ ===
+        function startAd() {
+            isPlaying = true;
+            timerFinished = false;
+            seconds = 10;
+            
+            // Очищаем старый интервал
+            if (interval) {
+                clearInterval(interval);
+                interval = null;
+            }
+            
+            // Показываем таймер, прячем кнопку
+            timer.style.display = 'block';
+            timer.textContent = '⏱ ' + seconds;
+            closeBtn.style.display = 'none';
+            
+            // Выбираем видео
+            const rndVid = Math.floor(Math.random() * 2);
+            if (rndVid === 0) {
+                video2.hidden = true;
+                video1.hidden = false;
+                video1.currentTime = 0;
+                video1.play().catch(() => {});
+            } else {
+                video1.hidden = true;
+                video2.hidden = false;
+                video2.currentTime = 0;
+                video2.play().catch(() => {});
+            }
+            
+            // Таймер
+            interval = setInterval(() => {
+                seconds--;
+                timer.textContent = '⏱ ' + seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    interval = null;
+                    timerFinished = true;
+                    timer.style.display = 'none';
+                    closeBtn.style.display = 'block';
+                    isPlaying = false;
+                }
+            }, 1000);
+            
+            // Когда видео закончилось
+            video1.onended = () => { if (!timerFinished) finishAd(); };
+            video2.onended = () => { if (!timerFinished) finishAd(); };
+        }
+        
+        // === ЗАВЕРШЕНИЕ РЕКЛАМЫ (если видео закончилось раньше таймера) ===
+        function finishAd() {
+            if (interval) {
+                clearInterval(interval);
+                interval = null;
+            }
+            timerFinished = true;
+            timer.style.display = 'none';
+            closeBtn.style.display = 'block';
+            isPlaying = false;
+        }
+        
+        // === КНОПКА "ПОЛУЧИТЬ НАГРАДУ" ===
+        closeBtn.onclick = function() {
+            console.log("Нажата кнопка, отправляю finish с:", rewardData);
+            
+            window.parent.postMessage({
+                type: "finish",
+                typeAd: rewardData ? rewardData.typeAd : null,
+                tipeGive: rewardData ? rewardData.tipeGive : null
+            }, '*');
+            
+            // Сброс
+            isPlaying = false;
+            rewardData = null;
+            closeBtn.style.display = 'none';
         };
     </script>
 </body>
