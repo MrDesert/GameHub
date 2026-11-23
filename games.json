@@ -33,6 +33,19 @@
             "gameUrl": "https://spirichyels.github.io/CritOrQuit/"
         },
         {
+            "id": "Evolution",
+            "title": "Эволюция",
+            "author": "MrDesert",
+            "logo": "",
+            "shortDesc": "Эволюция! Создай свои виды!.",
+            "fullDesc": "Вы можете наблюдать за появлением новых видов их вымиранием и эволюцией!",
+            "cover": "",
+            "video": "",
+            "gallery": [
+            ],
+            "gameUrl": "https://mrdesert.github.io/Evolution/"
+        },
+        {
             "id": "successfulfishing",
             "title": "Удачная рыбалка",
             "author": "MrDesert",
