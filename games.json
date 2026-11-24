@@ -1,7 +1,7 @@
 {
     "games": [
         {
-            "id": "minergame",
+            "id": "MinerGame",
             "title": "MinerGame",
             "author": "MrDesert",
             "logo": "IMG/MinerGameLogo.png",
@@ -37,13 +37,26 @@
             "title": "Эволюция",
             "author": "MrDesert",
             "logo": "https://mrdesert.github.io/Evolution/EvolutionLogo.jpg",
-            "shortDesc": "Эволюция! Создай свои виды!.",
+            "shortDesc": "Эволюция! Создай свои виды!...",
             "fullDesc": "Вы можете наблюдать за появлением новых видов их вымиранием и эволюцией!",
             "cover": "https://mrdesert.github.io/Evolution/EvolutionLogo.jpg",
             "video": "",
             "gallery": [
             ],
             "gameUrl": "https://mrdesert.github.io/Evolution/"
+        },
+        {
+            "id": "FromTheHomelessMillarder",
+            "title": "Из Бомжа в милиардеры",
+            "author": "MrDesert",
+            "logo": "https://mrdesert.github.io/From-the-homeless-millarder/EvolutionLogo.jpg",
+            "shortDesc": "Пройди путь от Бомжа до миллиардера!...",
+            "fullDesc": "Вы проснулись на вокзале без паспорта, с горстью мелочи в кармане и лёгким насморком. Впереди — грязные баки, придирчивые работодатели и одна-единственная мечта: собрать 300 000 ₽ и купить себе квартиру.",
+            "cover": "https://mrdesert.github.io/From-the-homeless-millarder/EvolutionLogo.jpg",
+            "video": "",
+            "gallery": [
+            ],
+            "gameUrl": "https://mrdesert.github.io/From-the-homeless-millarder/"
         },
         {
             "id": "successfulfishing",
