@@ -36,10 +36,10 @@
             "id": "Evolution",
             "title": "Эволюция",
             "author": "MrDesert",
-            "logo": "",
+            "logo": "https://mrdesert.github.io/Evolution/EvolutionLogo.jpg",
             "shortDesc": "Эволюция! Создай свои виды!.",
             "fullDesc": "Вы можете наблюдать за появлением новых видов их вымиранием и эволюцией!",
-            "cover": "IMG/EvolutionCover.png",
+            "cover": "https://mrdesert.github.io/Evolution/EvolutionLogo.jpg",
             "video": "",
             "gallery": [
             ],
