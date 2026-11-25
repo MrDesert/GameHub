@@ -39,7 +39,7 @@
             "logo": "https://mrdesert.github.io/Evolution/EvolutionLogo.jpg",
             "shortDesc": "Эволюция! Создай свои виды!...",
             "fullDesc": "Вы можете наблюдать за появлением новых видов их вымиранием и эволюцией!",
-            "cover": "https://mrdesert.github.io/Evolution/EvolutionLogo.jpg",
+            "cover": "https://mrdesert.github.io/Evolution/EvolutionCover.jpg",
             "video": "",
             "gallery": [
             ],
@@ -49,10 +49,10 @@
             "id": "FromTheHomelessMillarder",
             "title": "Из Бомжа в милиардеры",
             "author": "MrDesert",
-            "logo": "https://mrdesert.github.io/From-the-homeless-millarder/EvolutionLogo.jpg",
+            "logo": "",
             "shortDesc": "Пройди путь от Бомжа до миллиардера!...",
             "fullDesc": "Вы проснулись на вокзале без паспорта, с горстью мелочи в кармане и лёгким насморком. Впереди — грязные баки, придирчивые работодатели и одна-единственная мечта: собрать 300 000 ₽ и купить себе квартиру.",
-            "cover": "https://mrdesert.github.io/From-the-homeless-millarder/EvolutionLogo.jpg",
+            "cover": "",
             "video": "",
             "gallery": [
             ],
