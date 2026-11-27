@@ -565,3 +565,23 @@ footer {
     background: rgba(0,0,0,0.8);
     border: none;
 }
+
+/* Кликабельный промо-баннер в сайдбаре */
+.promo-banner {
+    display: block;
+    width: 100%;
+    border-radius: 0.8rem;
+    overflow: hidden;
+    border: 1px solid #3b82f6;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.promo-banner:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+}
+
+.promo-banner img {
+    width: 100%;
+    display: block;
+}

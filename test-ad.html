@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест рекламы - Хаб</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .test-panel {
+            background: #1e293b;
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 0 1rem 1rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .test-panel .btn { width: auto; }
+        .test-info {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            width: 100%;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body id="playBody">
+<div class="top-bar">
+    <div class="play-nav-buttons">
+        <a href="index.html" class="nav-btn">🎮 Все игры</a>
+    </div>
+    <div class="game-title-header">Тест рекламы</div>
+</div>
+
+<div class="game-layout">
+    <!-- Фейковая игра -->
+    <div class="game-area">
+        <iframe id="fakeGame" class="game-frame"></iframe>
+        <!-- Реклама (поверх игры) -->
+        <iframe id="adOverlay" src="ad.html"></iframe>
+    </div>
+    <!-- Сайдбар с баннером -->
+    <div class="ad-sidebar">
+        <div class="ad-label">Реклама</div>
+        <div class="banner-content">
+            <div class="fake-ad">🧨 Загрузка промо…</div>
+        </div>
+    </div>
+</div>
+
+<div class="test-panel">
+    <button class="btn" onclick="testRewarded(true)">▶ Rewarded с видео</button>
+    <button class="btn" onclick="testRewarded(false)">▶ Rewarded без видео</button>
+    <button class="btn" onclick="rollBanner()">🔄 Другой баннер</button>
+    <div class="test-info" id="testInfo">Загрузка промо-данных…</div>
+</div>
+
+<script>
+    const fakeGame = document.getElementById('fakeGame');
+    const adOverlay = document.getElementById('adOverlay');
+    const sidebar = document.querySelector('.ad-sidebar');
+    const info = document.getElementById('testInfo');
+
+    let isAdShowing = false;
+    let adReady = false;
+    let pendingAdStart = null;
+    let promoProjects = [];   // проекты с промо-материалами
+    let currentVideoUrl = '';
+    let currentClickUrl = '';
+
+    // ---------- Фейковая игра ----------
+    // Кнопка отправляет родителю 'start', на 'finish' показывает награду
+    fakeGame.srcdoc = `<!DOCTYPE html>
+<html style="height:100%;">
+<body style="height:100%;margin:0;background:#0b1120;color:#e2e8f0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:sans-serif;gap:1rem;">
+    <h2>🎮 Фейковая игра</h2>
+    <p>Нажми кнопку — игра «попросит» rewarded-рекламу</p>
+    <button id="reqBtn" style="padding:1rem 2rem;font-size:1.1rem;border-radius:2rem;border:none;background:#10b981;color:#fff;cursor:pointer;">🎁 Посмотреть рекламу за награду</button>
+    <p id="rewardMsg" style="font-size:1.2rem;color:#4ade80;min-height:2rem;"></p>
+    <script>
+        document.getElementById('reqBtn').addEventListener('click', () => {
+            window.parent.postMessage({ type: 'start', typeAd: 'rewarded', tipeGive: 'coins' }, '*');
+        });
+        window.addEventListener('message', (e) => {
+            if (e.data && e.data.type === 'finish') {
+                document.getElementById('rewardMsg').textContent = '🎉 Награда выдана: ' + (e.data.tipeGive || '—');
+            }
+        });
+    <\/script>
+</body>
+</html>`;
+
+    // ---------- Оркестрация (копия логики play.html) ----------
+    function sendToAd(payload) {
+        adOverlay.contentWindow.postMessage(payload, '*');
+    }
+
+    window.addEventListener('message', (event) => {
+        const data = event.data;
+        if (!data || !data.type) return;
+
+        // Сообщения от рекламного iframe
+        if (event.source === adOverlay.contentWindow) {
+            if (data.type === 'adReady') {
+                adReady = true;
+                if (pendingAdStart) {
+                    sendToAd(pendingAdStart);
+                    pendingAdStart = null;
+                }
+            } else if (data.type === 'finish') {
+                fakeGame.contentWindow.postMessage(data, '*');
+                isAdShowing = false;
+                adOverlay.style.display = 'none';
+                info.textContent = '✅ Реклама завершена, награда отправлена игре';
+            }
+            return;
+        }
+
+        // Сообщение от фейковой игры
+        if (event.source === fakeGame.contentWindow &&
+            data.type === 'start' && data.typeAd === 'rewarded') {
+            showAd(data.tipeGive, currentVideoUrl);
+        }
+    });
+
+    function showAd(tipeGive, videoUrl) {
+        if (isAdShowing) return;
+        isAdShowing = true;
+
+        const payload = {
+            type: 'start',
+            typeAd: 'rewarded',
+            tipeGive: tipeGive,
+            videoUrl: videoUrl || '',
+            clickUrl: currentClickUrl || ''
+        };
+
+        adOverlay.style.display = 'block';
+        if (adReady) sendToAd(payload);
+        else pendingAdStart = payload;
+    }
+
+    // Кнопки панели — то же самое, но напрямую (мимо фейковой игры)
+    function testRewarded(withVideo) {
+        showAd('coins', withVideo ? currentVideoUrl : '');
+        info.textContent = withVideo
+            ? '▶ Запущен rewarded с видео'
+            : '▶ Запущен rewarded без видео (только таймер)';
+    }
+
+    // ---------- Баннер ----------
+    function rollBanner() {
+        const withBanners = promoProjects.filter(g => g.promo.banners.length > 0);
+        if (!withBanners.length) {
+            sidebar.innerHTML = `<div class="ad-label">Реклама</div>
+                <div class="banner-content"><div class="fake-ad">🧨 Нет баннеров ни в одном промо-проекте</div></div>`;
+            info.textContent = '⚠️ Баннеров нет — сайдбар в хабе будет скрыт';
+            return;
+        }
+        const game = pickRandom(withBanners);
+        const banner = pickRandom(game.promo.banners);
+        sidebar.innerHTML = `
+            <a class="promo-banner" href="game.html?id=${encodeURIComponent(game.id)}" target="_blank" rel="noopener">
+                <img src="${banner}" alt="Реклама: ${escapeHtml(game.title)}">
+            </a>
+            <div class="ad-label">Реклама · ${escapeHtml(game.title)}</div>`;
+        info.textContent = '🖼 Баннер: ' + game.title + ' → ' + banner;
+    }
+
+    // ---------- Загрузка промо-данных ----------
+    function resolveUrl(path, base) {
+        if (!path) return '';
+        try { return new URL(path, base).href; } catch (e) { return path; }
+    }
+    function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function escapeHtml(str) {
+        return String(str ?? '')
+            .replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');
+    }
+    function idFromUrl(url) {
+        const parts = url.replace(/\/+$/, '').split('/');
+        return parts[parts.length - 1] || 'game';
+    }
+
+    async function loadPromo() {
+        try {
+            const manifest = await (await fetch('games.json', { cache: 'no-cache' })).json();
+
+            const results = await Promise.allSettled((manifest.promo || []).map(async (url) => {
+                const base = url.endsWith('/') ? url : url + '/';
+                const resp = await fetch(resolveUrl('game.json', base), { cache: 'no-cache' });
+                if (!resp.ok) throw new Error(resp.status);
+                const data = await resp.json();
+                return {
+                    id: data.id || idFromUrl(base),
+                    title: data.title || 'Без названия',
+                    promo: {
+                        banners: ((data.promo && data.promo.banners) || []).map(p => resolveUrl(p, base)),
+                        videos: ((data.promo && data.promo.videos) || []).map(p => resolveUrl(p, base))
+                    }
+                };
+            }));
+
+            promoProjects = results.filter(r => r.status === 'fulfilled').map(r => r.value);
+            const failed = results.filter(r => r.status === 'rejected').length;
+
+            rollBanner();
+
+            // Готовим rewarded-ролик
+            const withVideos = promoProjects.filter(g => g.promo.videos.length > 0);
+            if (withVideos.length) {
+                const game = pickRandom(withVideos);
+                currentVideoUrl = pickRandom(game.promo.videos);
+                currentClickUrl = 'game.html?id=' + encodeURIComponent(game.id);
+            }
+
+            info.textContent =
+                `Промо-проектов: ${promoProjects.length}` +
+                (failed ? ` (не загрузились: ${failed})` : '') +
+                ` · Видео для rewarded: ${currentVideoUrl || 'нет'} · Клик: ${currentClickUrl || 'нет'}`;
+        } catch (e) {
+            info.textContent = '❌ Ошибка загрузки games.json: ' + e.message;
+        }
+    }
+
+    loadPromo();
+</script>
+</body>
+</html>

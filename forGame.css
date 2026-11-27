@@ -1,0 +1,29 @@
+ *{
+    touch-action: manipulation; /*  отключить двойной тап на сенсорных устройствах для увеличения  */
+    -webkit-tap-highlight-color: transparent; /* убираем синию подсветку при тапе на элементы */
+    overflow: hidden; /* что бы экран не расширялся на телефоне из-за появления элементов за границей*/
+    
+    /* отключает выделение текста  для всех браузеров*/
+    user-select: none; 
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+
+    /* отключаем контекстное меню долгим нажатием на IOS */
+    -webkit-touch-callout: none;
+
+    -webkit-user-drag: none;
+
+ }
+  body {
+    overscroll-behavior-y: contain;
+   -webkit-overflow-scrolling: auto; /* Отключаем инерционную прокрутку */
+    touch-action: none; /* Блокируем все тач-жесты */
+ }
+ /* html{
+    overscroll-behavior-y: none; /* должен отключить прокрутку на ios при свайпе 
+ } */
+ img{
+    pointer-events: none;
+    /* draggable: false; */
+ }

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://desertbox.ru/sitemap.xml

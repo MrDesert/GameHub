@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, follow">
     <title>Игровой плеер - Хаб</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -23,64 +24,8 @@
         <!-- Реклама (поверх игры) -->
         <iframe id="adOverlay" src="ad.html"></iframe>
     </div>
-   <script>
-    const gameIframe = document.getElementById('gameIframe');
-    const adOverlay = document.getElementById('adOverlay');
-    let isAdShowing = false; // ← ДОБАВЛЯЕМ ФЛАГ
 
-    window.addEventListener('message', (event) => {
-        if (event.source === window) {
-            console.log("Родитель: сообщение от себя, игнорирую");
-            return;
-        }
-
-        const data = event.data;
-        const type = data?.type;
-        const typeAd = data?.typeAd;
-        const tipeGive = data?.tipeGive;
-
-        if (type === 'start') {
-            // === ЕСЛИ РЕКЛАМА УЖЕ ПОКАЗЫВАЕТСЯ — ИГНОРИРУЕМ ===
-            if (isAdShowing) {
-                console.warn("Реклама уже показывается, игнорирую повторный start");
-                return;
-            }
-
-            if (typeAd === 'rewarded') {
-                isAdShowing = true; // ← УСТАНАВЛИВАЕМ ФЛАГ
-                console.log("Показываю рекламу, награда:", tipeGive);
-                
-                adOverlay.contentWindow.postMessage({
-                    type: type,
-                    typeAd: typeAd,
-                    tipeGive: tipeGive
-                }, '*');
-                showAdRewarded();
-            }
-        } else if (type === 'finish') {
-            console.log("На главную пришло реклама на финише", tipeGive);
-            gameIframe.contentWindow.postMessage({
-                    type: type,
-                    typeAd: typeAd,
-                    tipeGive: tipeGive
-            }, '*');
-            isAdShowing = false; // ← СБРАСЫВАЕМ ФЛАГ
-            adOverlay.style.display = 'none';
-        }
-    });
-
-    function showAdRewarded() {
-        adOverlay.style.display = 'block';
-        // НЕ ПЕРЕЗАГРУЖАЙ iframe!
-        // adOverlay.src = adOverlay.src;
-    }
-
-    function hideAd() {
-        adOverlay.style.display = 'none';
-    }
-</script>
-
-    <!-- БАННЕР СПРАВА -->
+    <!-- БАННЕР СПРАВА (заполняется из script.js) -->
     <div class="ad-sidebar">
         <div class="ad-label">Реклама</div>
         <div class="banner-content">
@@ -93,7 +38,65 @@
     </div>
 </div>
 
-<footer>© by MrDesert v0.0.0.0.3 DesertBox - Хаб игр</footer>
+<script>
+    const gameIframe = document.getElementById('gameIframe');
+    const adOverlay = document.getElementById('adOverlay');
+
+    let isAdShowing = false;   // реклама сейчас на экране
+    let adReady = false;       // ad.html сообщил о готовности
+    let pendingAdStart = null; // старт, пришедший до готовности ad.html
+
+    function sendToAd(payload) {
+        adOverlay.contentWindow.postMessage(payload, '*');
+    }
+
+    window.addEventListener('message', (event) => {
+        const data = event.data;
+        if (!data || !data.type) return;
+
+        // === Сообщения от рекламного iframe ===
+        if (event.source === adOverlay.contentWindow) {
+            if (data.type === 'adReady') {
+                adReady = true;
+                if (pendingAdStart) {
+                    sendToAd(pendingAdStart);
+                    pendingAdStart = null;
+                }
+            } else if (data.type === 'finish') {
+                // Передаём финиш игре и прячем рекламу
+                gameIframe.contentWindow.postMessage(data, '*');
+                isAdShowing = false;
+                adOverlay.style.display = 'none';
+            }
+            return;
+        }
+
+        // === Сообщение от игры ===
+        if (event.source === gameIframe.contentWindow &&
+            data.type === 'start' && data.typeAd === 'rewarded') {
+
+            if (isAdShowing) {
+                console.warn('Реклама уже показывается, игнорирую повторный start');
+                return;
+            }
+            isAdShowing = true;
+
+            const payload = {
+                type: 'start',
+                typeAd: data.typeAd,
+                tipeGive: data.tipeGive,
+                videoUrl: window.__adVideoUrl || '',
+                clickUrl: window.__adClickUrl || ''
+            };
+
+            adOverlay.style.display = 'block';
+            if (adReady) sendToAd(payload);
+            else pendingAdStart = payload;
+        }
+    });
+</script>
+
+<footer>© by MrDesert v0.0.1.0.0.0 DesertBox - Хаб игр</footer>
 <script src="script.js"></script>
 </body>
 </html>
